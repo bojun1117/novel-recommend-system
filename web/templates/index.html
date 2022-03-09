@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>aiot project</title>
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+	<style type="text/css">
+		body{	
+            padding: 0px 0px 0px 0px;
+            margin:0px 0px 0px 0px;
+            background-image: url('static/background.png');
+            background-repeat:no-repeat;
+            background-attachment:fixed;
+            background-size: 100% auto ;
+		}
+        main{
+            padding: 70px 0px 0px 0px;
+            margin:0px 0px 0px 0px;
+        }
+        td{   
+            font-size: 25px;
+            font-family:Microsoft JhengHei;
+            height: 40px;
+        }
+        th{
+            font-size: 30px;
+            font-family:Microsoft JhengHei;
+            width:10vw;
+            text-align: left;
+        }
+        th:hover{
+            color:blue;
+        }
+        #title{
+            top:0;
+        	display: flex;
+        	align-items: center;
+        	position:fixed;
+            float:right;
+            padding: 0px 0px 0px 0px;
+            margin:0px 0px 0px 0px;
+            background-color:#000228;
+            height:70px;
+            width:100vw;
+        }
+        #title span{
+            margin:0 auto;
+        	color: white;
+        	font-size: 40px;
+        	font-family:Microsoft JhengHei;
+        }
+        #recommend{
+            margin:50px auto 20px auto;
+        }
+        #control{
+            margin:0 auto;
+        }
+    </style>
+	<script>
+        var column='rate';
+        var order='desc';
+        var page=1;
+        var maxpage=1;
+        var title={"name":"標題","ccount":"近期討論","pcount":"好評","ncount":"負評","rate":"評分","keyword":"關鍵字"}
+        $(function(){
+            $.getdata=function(){
+                $.ajax({ 
+                url: '/getData?column='+column+'&order='+order+"&page="+page,    
+                data: "{}",
+                dataType: 'json', 
+                success: function (data) { 
+                    page=data[1];
+                    maxpage=data[0];
+                    $("#infor").html(page+'/'+maxpage);
+                    $("#recommend_body").html('');
+                    for (var i =  0; i < data[2].length; i++)
+                    {
+                        $("#recommend_body").append(
+                        "<tr>"+
+                            "<td>"+data[2][i][0]+"</td>"+
+                            "<td>"+data[2][i][1]+"</td>"+
+                            "<td>"+data[2][i][2]+"</td>"+
+                            "<td>"+data[2][i][3]+"</td>"+
+                            "<td>"+data[2][i][4]+"</td>"+
+                            "<td>"+data[2][i][5]+"</td>"+
+                        "</tr>")
+                    }
+                    if(10>data[2].length)
+                    for (var i =  0; i < 10-data[2].length; i++)
+                    {
+                        $("#recommend_body").append(
+                        "<tr>"+
+                            "<td></td>"+
+                            "<td></td>"+
+                            "<td></td>"+
+                            "<td></td>"+
+                            "<td></td>"+
+                            "<td></td>"+
+                        "</tr>")
+                   }
+                }, 
+                error: function (XMLHttpRequest, textStatus, errorThrown) { 
+                    alert("error"); 
+                } 
+                });
+            }
+            $.settitle=function(type){
+                $("#name").html(title['name']);
+                $("#ccount").html(title['ccount']);
+                $("#pcount").html(title['pcount']);
+                $("#ncount").html(title['ncount']);
+                $("#rate").html(title['rate']);
+                $("#keyword").html(title['keyword']);
+                if(type==column){
+                    if(order=='desc'){
+                        order='asc';
+                        $("#"+type).html(title[type]+"▲");
+                    }
+                    else{
+                        order='desc';
+                        $("#"+type).html(title[type]+"▼");
+                    }
+                }
+                else{
+                    column=type;
+                    order='desc';
+                    $("#"+type).html(title[type]+"▼");
+                }
+                page=1;
+            }
+        })
+        
+        $(document).ready(function() {
+            $.settitle('name');
+            $.getdata();
+        });
+    </script>
+</head>
+<body>
+	<header>
+        <div id="title">
+        	<span>中興小說網</span>
+        </div>
+    </header>
+    <main>
+        
+        <table id='recommend'>
+            <thead>
+                <tr>
+                    <th id='name'>標題</th>
+                    <th id='ccount'>近期討論</th>
+                    <th id='pcount'>好評</th>
+                    <th id='ncount'>負評</th>
+                    <th id='rate'>評分</th>
+                    <th id='keyword'>關鍵字</th>
+                </tr>
+
+            </thead>
+            <tbody id='recommend_body'></tbody>
+        </table>
+        
+
+        <center>
+            <button id = "pre">上一頁</button>
+            <span id='infor'>1/0</span>
+            <button id = "next">下一頁</button>
+        </center>
+        
+        <script> 
+            $('#name').click(function(){
+                $.settitle('name');
+                $.getdata();
+            });
+            $('#ccount').click(function(){
+                $.settitle('ccount');
+                $.getdata();
+            });
+            $('#pcount').click(function(){
+                $.settitle('pcount');
+                $.getdata();
+            });
+            $('#ncount').click(function(){
+                $.settitle('ncount');
+                $.getdata();
+            });
+            $('#rate').click(function(){
+                $.settitle('rate');
+                $.getdata();
+            });
+            $('#keyword').click(function(){
+                $.settitle('keyword');
+                $.getdata();
+            });
+            $('#next').click(function(){
+                if(page<maxpage)
+                    page++;
+                $.getdata();
+            });
+            $('#pre').click(function(){
+                if(page>1)
+                    page--;
+                $.getdata();
+            });
+        </script>
+    </main>
+</body>
+</html>
